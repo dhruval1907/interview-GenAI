@@ -1,12 +1,11 @@
 const dotenv = require("dotenv/config")
 const express = require("express")
 const authRouter = require("../src/routes/auth.routes")
-const CookieParser = require("cookieparser")
-
+const cookieParser = require("cookie-parser")
 // middlewares
 const app = express()
 app.use(express.json())
-app.use(CookieParser())
+app.use(cookieParser())
 
 // routes
 app.use("/api/auth", authRouter)

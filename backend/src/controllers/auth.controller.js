@@ -1,7 +1,6 @@
 const userModel = require("../model/user.model")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
-const cookieParser  = require("cookieparser")
 
 
 async function registerHandle(req, res) {
@@ -10,12 +9,12 @@ async function registerHandle(req, res) {
 
     const isUserAlreadyExits = await userModel.findOne({
         $or: [
-            { username }, { email }
+            { email }, { username }
         ]
     })
 
     if (isUserAlreadyExits) {
-        return res.status(401).json({
+        return res.status(409).json({
             message: "user already exits"
         })
     }
@@ -33,7 +32,51 @@ async function registerHandle(req, res) {
     res.cookie("token", token)
 
     res.status(201).json({
-        message: "user registerd successfully"
+        message: "user registerd successfully",
+        user
+    })
+
+
+
+}
+
+async function loginHanlde(req, res) {
+
+    const { email, username, password } = req.body
+
+    const user = await userModel.findOne({
+        $or: [
+            { username }, { email }
+        ]
+    })
+
+    if (!user) {
+        return res.status(400).json({
+            message: "user not exitss "
+        })
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password)
+
+    if (!isPasswordValid) {
+        return res.status(400).json({
+            message: "passwor is invalid"
+        })
+    }
+
+    const token = jwt.sign({
+        id: user._id
+    }, process.env.JWT_SECRET)
+
+    res.cookie("token", token)
+
+    res.status(200).json({
+        message: "user logged in",
+        user: {
+            id: user._id,
+            name: user.username,
+            email: user.email
+        }
     })
 
 
@@ -41,6 +84,6 @@ async function registerHandle(req, res) {
 }
 
 module.exports = {
-    registerHandle
+    registerHandle, loginHanlde
 }
 
