@@ -1,0 +1,41 @@
+import axios from "axios";
+
+const api = axios.create({
+    baseURL: "http://localhost:3000",
+    withCredentials: true
+})
+
+export async function registerUser({ email, username, password }) {
+
+    const response = await api.post("/api/post/register", {
+        email, username, password
+    })
+
+    return response.data
+
+}
+
+export async function loginUser({ email, username }) {
+
+    const response = await api.post("/api/auth/login", {
+        email, username
+    })
+
+    return response.data
+
+}
+
+export async function logout() {
+    const response = await api.get("/api/auth/logout")
+
+    return response.data
+
+}
+
+export async function getme() {
+    const response = await api.get("/api/auth/getme")
+
+    return response.data
+
+}
+
